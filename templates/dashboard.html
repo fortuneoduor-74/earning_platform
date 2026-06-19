@@ -1,0 +1,274 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+  .nav-pills .nav-link.active {
+      background-color: #1e3c72 !important;
+      color: #fff !important;
+  }
+  .nav-pills .nav-link {
+      color: #495057;
+      transition: all 0.2s ease-in-out;
+  }
+  .fw-black { font-weight: 900; }
+  .d-flex.flex-wrap.gap-2 .btn {
+      transition: transform 0.15s ease-in-out;
+  }
+  .d-flex.flex-wrap.gap-2 .btn:hover {
+      transform: translateY(-2px);
+  }
+</style>
+
+<div class="card p-3 mb-4 border-0 text-white shadow-sm" style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <div>
+            <h4 class="fw-bold mb-0">Console Overview, {{ current_user.username }}!</h4>
+            <small class="opacity-75">Secure Node Connection: <code>#{{ current_user.id }}</code></small>
+        </div>
+        <div class="text-md-end bg-white bg-opacity-10 px-3 py-2 rounded-3">
+            <span class="small d-block opacity-75">Available Balance</span>
+            <h3 class="fw-black mb-0 text-warning" id="user-wallet-balance">{{ "%.2f"|format(current_user.balance) }} KSH</h3>
+        </div>
+    </div>
+</div>
+
+<ul class="nav nav-pills nav-fill bg-white p-2 rounded-3 shadow-sm mb-4" id="dashboardTabs" role="tablist">
+    <li class="nav-item"><button class="nav-link active fw-bold py-2" id="wallet-tab" data-bs-toggle="tab" data-bs-target="#wallet-content" type="button" role="tab"><i class="bi bi-wallet2 me-1"></i>Wallet</button></li>
+    <li class="nav-item"><button class="nav-link fw-bold py-2" id="ads-tab" data-bs-toggle="tab" data-bs-target="#ads-content" type="button" role="tab"><i class="bi bi-play-btn me-1"></i>Video Ads</button></li>
+    <li class="nav-item"><button class="nav-link fw-bold py-2" id="games-tab" data-bs-toggle="tab" data-bs-target="#games-content" type="button" role="tab"><i class="bi bi-dice-5 me-1"></i>Arcade</button></li>
+    <li class="nav-item"><button class="nav-link fw-bold py-2" id="jobs-tab" data-bs-toggle="tab" data-bs-target="#jobs-content" type="button" role="tab"><i class="bi bi-briefcase me-1"></i>Micro Jobs</button></li>
+</ul>
+
+<div class="tab-content" id="dashboardTabsContent">
+    
+    <div class="tab-pane fade show active" id="wallet-content" role="tabpanel">
+        <div class="card p-4 shadow-sm bg-white mb-4">
+            <h5 class="fw-bold mb-3"><i class="bi bi-shield-check text-primary"></i> Verification Pipeline</h5>
+            {% if not current_user.is_activated %}
+                <div class="alert alert-warning border-0 p-3 d-flex align-items-start mb-0">
+                    <i class="bi bi-exclamation-octagon-fill fs-4 me-3 mt-1"></i>
+                    <div>
+                        <h6 class="fw-bold mb-1">Account Connections Pending Link Initialization</h6>
+                        <p class="small mb-3">Pay the standard activation node threshold of 450.00 KSH to unlock instant reward extraction matrices.</p>
+                        <form action="{{ url_for('activate_account') }}" method="POST">
+                            <button type="submit" class="btn btn-warning btn-sm fw-bold px-3">Trigger Mock M-PESA Activation</button>
+                        </form>
+                    </div>
+                </div>
+            {% else %}
+                <div class="alert alert-success border-0 mb-0"><i class="bi bi-check-circle-fill me-2"></i>Node status online and active.</div>
+            {% endif %}
+        </div>
+
+        <div class="card p-4 shadow-sm bg-white">
+            <h5 class="fw-bold mb-1"><i class="bi bi-share-fill text-success"></i> Invite & Earn Program</h5>
+            <p class="text-muted small mb-3">Share your unique node verification link across social media networks. Receive an automatic <strong>300.00 KSH</strong> payload instantly when your partner connects!</p>
+            
+            <div class="p-3 bg-light rounded border mb-3">
+                <label class="small text-muted fw-bold d-block mb-1">Personal Referral Link Address (Bio Optimized)</label>
+                <div class="input-group">
+                    <input type="text" id="refLinkUrl" class="form-control form-control-sm bg-white fw-bold text-primary" value="{{ request.url_root }}register?ref={{ current_user.referral_code }}" readonly>
+                    <button class="btn btn-dark btn-sm text-white fw-bold" onclick="copyReferralToClipboard()"><i class="bi bi-copy"></i> Copy Link</button>
+                </div>
+                <small id="copyToast" class="text-success fw-bold d-none mt-1 small"><i class="bi bi-check-lg"></i> Copied securely! Ready for TikTok / Instagram bios.</small>
+            </div>
+
+            <label class="small text-muted fw-bold d-block mb-2">Direct Sharing Modules</label>
+            <div class="d-flex flex-wrap gap-2">
+                <a href="#" id="share-wa" target="_blank" class="btn btn-sm text-white fw-bold px-3" style="background-color: #25D366;"><i class="bi bi-whatsapp me-1"></i> WhatsApp</a>
+                <a href="#" id="share-tg" target="_blank" class="btn btn-sm text-white fw-bold px-3" style="background-color: #0088cc;"><i class="bi bi-telegram me-1"></i> Telegram</a>
+                <a href="#" id="share-fb" target="_blank" class="btn btn-sm text-white fw-bold px-3" style="background-color: #1877F2;"><i class="bi bi-facebook me-1"></i> Facebook</a>
+                <a href="#" id="share-x" target="_blank" class="btn btn-sm text-white fw-bold px-3" style="background-color: #000000;"><i class="bi bi-twitter-x me-1"></i> X / Twitter</a>
+                <a href="#" id="share-ln" target="_blank" class="btn btn-sm text-white fw-bold px-3" style="background-color: #0077b5;"><i class="bi bi-linkedin me-1"></i> LinkedIn</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="tab-pane fade" id="ads-content" role="tabpanel">
+        <div class="card p-4 shadow-sm bg-white">
+            <h5 class="fw-bold mb-3">Active Reward Video Channels</h5>
+            <div class="row g-3">
+                {% for ad in ads %}
+                <div class="col-md-6">
+                    <div class="p-3 border rounded bg-light h-100 d-flex flex-column justify-content-between">
+                        <div>
+                            <h6 class="fw-bold text-dark mb-1">{{ ad.title }}</h6>
+                            <span class="badge bg-success">+{{ "%.2f"|format(ad.reward) }} KSH View Reward</span>
+                        </div>
+                        <a href="{{ url_for('watch_ad', ad_id=ad.id) }}" class="btn btn-sm btn-outline-primary w-100 mt-3">Watch Verification Stream</a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <div class="tab-pane fade" id="games-content" role="tabpanel">
+        <div class="row g-3">
+            <div class="col-md-6">
+                <div class="card p-4 shadow-sm h-100 bg-white">
+                    <h5 class="fw-bold mb-3"><i class="bi bi-coin text-warning"></i> Coinflip Node</h5>
+                    <input type="number" id="coinflipAmount" class="form-control mb-2" placeholder="Bet Amount (KSH)">
+                    <div class="d-flex gap-2">
+                        <button onclick="playCoinflip('heads')" class="btn btn-primary w-50 py-2">HEADS</button>
+                        <button onclick="playCoinflip('tails')" class="btn btn-dark w-50 py-2">TAILS</button>
+                    </div>
+                    <div id="coinflipResult" class="alert d-none small fw-bold text-center mt-3 py-2"></div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card p-4 shadow-sm h-100 bg-white">
+                    <h5 class="fw-bold mb-2"><i class="bi bi-airplane text-danger"></i> Aviator Flight Sockets</h5>
+                    <div class="d-flex align-items-center justify-content-between bg-dark p-3 rounded mb-2">
+                        <span class="text-white-50 small">Live Multiplier Status:</span>
+                        <h3 class="fw-black text-warning mb-0" id="aviatorLiveMultiplier">1.00x</h3>
+                    </div>
+                    <div class="input-group mb-2">
+                        <input type="number" id="aviatorAmount" class="form-control" placeholder="Flight Stake">
+                        <button onclick="launchAviator()" id="aviatorLaunchBtn" class="btn btn-danger fw-bold">Launch Flight</button>
+                    </div>
+                    <button id="aviatorCashoutBtn" class="btn btn-success w-100 fw-bold py-2" disabled>Claim Multiplier Winnings</button>
+                    <div id="aviatorLog" class="small fw-bold text-center mt-2 text-muted"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="tab-pane fade" id="jobs-content" role="tabpanel">
+        <div class="card p-4 shadow-sm bg-white">
+            <h5 class="fw-bold mb-3">Available Freelance Nodes</h5>
+            <div class="row g-3">
+                {% for job in jobs %}
+                <div class="col-md-6">
+                    <div class="p-3 border rounded bg-light h-100 d-flex flex-column justify-content-between">
+                        <div>
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h6 class="fw-bold text-dark mb-0">{{ job.title }}</h6>
+                                <span class="badge bg-primary">{{ "%.2f"|format(job.reward) }} KSH</span>
+                            </div>
+                            <p class="small text-muted mb-3">{{ job.description }}</p>
+                        </div>
+                        {% if job.id in completed_job_ids %}
+                            <button class="btn btn-secondary btn-sm w-100" disabled><i class="bi bi-check-all"></i> Submission Pending Admin Sync</button>
+                        {% else %}
+                            <form action="{{ url_for('submit_job_proof', job_id=job.id) }}" method="POST" enctype="multipart/form-data" class="bg-white p-2 rounded border">
+                                <input type="text" name="proof_text" class="form-control form-control-sm mb-1" placeholder="Provide confirmation log mapping string...">
+                                <input type="file" name="proof_file" class="form-control form-control-sm mb-2" accept=".pdf">
+                                <button type="submit" class="btn btn-sm btn-dark w-100">Upload Verification Package</button>
+                            </form>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.socketio.org/4.7.2/socketio.min.js"></script>
+<script>
+const socket = io();
+const currentUserId = "{{ current_user.id }}";
+const shareText = "Hey! Join EarnHub right now, activate your server connection, and start making daily income! Sign up here: ";
+const refLink = document.getElementById('refLinkUrl').value;
+
+// Configure sharing targets dynamically
+document.getElementById('share-wa').href = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText + refLink)}`;
+document.getElementById('share-tg').href = `https://t.me/share/url?url=${encodeURIComponent(refLink)}&text=${encodeURIComponent(shareText)}`;
+document.getElementById('share-fb').href = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(refLink)}`;
+document.getElementById('share-x').href = `https://x.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(refLink)}`;
+document.getElementById('share-ln').href = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(refLink)}`;
+
+// Tab Switching Prevention Guard during Active Games
+document.querySelectorAll('button[data-bs-toggle="tab"]').forEach(tabBtn => {
+    tabBtn.addEventListener('show.bs.tab', function (event) {
+        const cashoutBtn = document.getElementById('aviatorCashoutBtn');
+        if (cashoutBtn && !cashoutBtn.disabled) {
+            event.preventDefault(); 
+            alert("⚠️ Flight in progress! Complete your current run or wait for crash before changing menus.");
+        }
+    });
+});
+
+function copyReferralToClipboard() {
+    const copyText = document.getElementById("refLinkUrl");
+    copyText.select();
+    copyText.setSelectionRange(0, 99999);
+    try {
+        navigator.clipboard.writeText(copyText.value);
+    } catch (err) {
+        document.execCommand("copy"); // Legacy in-app browser fallback (TikTok/IG)
+    }
+    const toast = document.getElementById('copyToast');
+    toast.classList.remove('d-none');
+    setTimeout(() => toast.classList.add('d-none'), 4000);
+}
+
+{% if not current_user.is_activated %}
+const mpesaInterval = setInterval(() => {
+    fetch('/api/v1/mpesa/check-status')
+    .then(r => r.json())
+    .then(data => {
+        if(data.activated) {
+            clearInterval(mpesaInterval);
+            window.location.reload();
+        }
+    });
+}, 3000);
+{% endif %}
+
+function playCoinflip(side) {
+    const amount = document.getElementById('coinflipAmount').value;
+    fetch('/play/coinflip', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({bet_amount: amount, chosen_side: side})
+    })
+    .then(r => r.json())
+    .then(data => {
+        const d = document.getElementById('coinflipResult');
+        d.classList.remove('d-none', 'alert-success', 'alert-danger');
+        d.classList.add(data.success ? 'alert-success' : 'alert-danger');
+        d.innerText = data.message;
+        if(data.success) document.getElementById('user-wallet-balance').innerText = data.new_balance.toFixed(2) + " KSH";
+    });
+}
+
+let tickPulse = null;
+function launchAviator() {
+    const stakeVal = document.getElementById('aviatorAmount').value;
+    if(!stakeVal || stakeVal <= 0) return;
+    socket.emit('join_aviator', { user_id: currentUserId, stake: stakeVal });
+}
+
+socket.on('flight_started', function(data) {
+    document.getElementById('aviatorLaunchBtn').disabled = true;
+    document.getElementById('aviatorCashoutBtn').disabled = false;
+    document.getElementById('aviatorLog').innerText = "Plane flying... Cashout before explosion!";
+    tickPulse = setInterval(() => { socket.emit('request_multiplier_tick', { user_id: currentUserId }); }, 200);
+});
+
+socket.on('tick_update', function(data) { document.getElementById('aviatorLiveMultiplier').innerText = data.multiplier + "x"; });
+
+socket.on('flight_crashed', function(data) {
+    clearInterval(tickPulse);
+    document.getElementById('aviatorLaunchBtn').disabled = false;
+    document.getElementById('aviatorCashoutBtn').disabled = true;
+    document.getElementById('aviatorLiveMultiplier').innerText = "💥 " + data.crash_point + "x";
+    document.getElementById('aviatorLog').innerText = "Crashed!";
+});
+
+document.getElementById('aviatorCashoutBtn').addEventListener('click', function() {
+    clearInterval(tickPulse);
+    socket.emit('claim_cashout', { user_id: currentUserId });
+});
+
+socket.on('cashout_result', function(data) {
+    document.getElementById('aviatorLaunchBtn').disabled = false;
+    document.getElementById('aviatorCashoutBtn').disabled = true;
+    document.getElementById('aviatorLog').innerText = data.message;
+    if(data.success) document.getElementById('user-wallet-balance').innerText = data.new_balance.toFixed(2) + " KSH";
+});
+</script>
+{% endblock %}
