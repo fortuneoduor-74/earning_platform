@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card p-4 mx-auto" style="max-width: 400px;">
+    <h2 class="fw-bold mb-3">Create an Account</h2>
+    <form method="POST">
+        <input type="hidden" name="ref" value="{{ ref }}">
+        <div class="mb-2">
+            <label class="small text-muted form-label mb-1">Username</label>
+            <input type="text" name="username" placeholder="Enter username" class="form-control" required>
+        </div>
+        <div class="mb-2">
+            <label class="small text-muted form-label mb-1">Email Address</label>
+            <input type="email" name="email" placeholder="name@example.com" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label class="small text-muted form-label mb-1">Secure Password</label>
+            <input type="password" name="password" placeholder="Minimum 8 characters" class="form-control" minlength="8" required>
+            <div class="form-text small opacity-75">Must be at least 8 characters long.</div>
+        </div>
+        <button type="submit" class="btn btn-primary w-100 mb-3 py-2">Register Now</button>
+    </form>
+    
+    <div class="text-center border-top pt-3">
+        <p class="mb-0 text-muted small">Already have an active node mapped?</p>
+        <a href="{{ url_for('login') }}" class="text-decoration-none fw-bold">Login Here</a>
+    </div>
+</div>
+{% endblock %}
