@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card p-4 text-center mx-auto" style="max-width: 500px;">
+    <h3>{{ ad.title }}</h3>
+    <p class="text-muted">You must view this ad completely to earn your reward.</p>
+    
+    <hr>
+
+    <div id="watch-section">
+        <a href="{{ ad.video_url }}" target="_blank" id="startAdBtn" class="btn btn-danger btn-lg w-100 mb-3">
+            Click to Watch Video
+        </a>
+        <p class="small text-secondary">The timer will start once you click the button above.</p>
+    </div>
+
+    <div id="timer-section" class="d-none my-3">
+        <div class="spinner-border text-primary mb-2" role="status"></div>
+        <h4>Verifying view state... <span id="countdown">30</span>s remaining</h4>
+    </div>
+
+    <div id="reward-section" class="d-none">
+        <div class="alert alert-success">✓ Video viewing requirement met!</div>
+        <form action="{{ url_for('claim_reward', ad_id=ad.id) }}" method="POST">
+            <button type="submit" class="btn btn-success btn-lg w-100">Claim {{ ad.reward }} KSH Reward</button>
+        </form>
+    </div>
+</div>
+
+<script>
+document.getElementById('startAdBtn').addEventListener('click', function() {
+    // Hide the initial watch button instruction block
+    document.getElementById('watch-section').classList.add('d-none');
+    // Show the active countdown timer
+    document.getElementById('timer-section').classList.remove('d-none');
+
+    let dynamicSeconds = 30; // Set required view duration here (e.g., 30 seconds)
+    const countdownText = document.getElementById('countdown');
+
+    const interval = setInterval(() => {
+        dynamicSeconds--;
+        countdownText.innerText = dynamicSeconds;
+
+        if (dynamicSeconds <= 0) {
+            clearInterval(interval);
+            // Hide the timer state and unlock the reward system submission button
+            document.getElementById('timer-section').classList.add('d-none');
+            document.getElementById('reward-section').classList.remove('d-none');
+        }
+    }, 1000);
+});
+</script>
+{% endblock %}
