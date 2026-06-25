@@ -7,3 +7,4 @@ gunicorn==23.0.0
 flask-socketio==5.3.6
 eventlet==0.35.2
 gevent==24.2.1
+dnspython==2.2.1
